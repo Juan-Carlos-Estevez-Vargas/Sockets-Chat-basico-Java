@@ -61,6 +61,7 @@ class PanelMarcoCliente extends JPanel {
 
         // Instancia de la clase interna que mediante un Socket envía texto
         EnviarTexto evento = new EnviarTexto();
+
         // Añadiendo el evento (clase interna) al botón, para que al presionar dicho botón, se inicie el Socket
         boton.addActionListener(evento);
 
@@ -89,6 +90,12 @@ class PanelMarcoCliente extends JPanel {
                 datos.setNick(nick.getText());
                 datos.setIp(ip.getText());
                 datos.setMensaje(campo1.getText());
+
+                // Flujo de datos de tipo Objeto
+                ObjectOutputStream paquete_datos = new ObjectOutputStream(socket.getOutputStream());
+                paquete_datos.writeObject(datos); // Escribiendo en el flujo de datos
+
+                socket.close();
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -98,7 +105,8 @@ class PanelMarcoCliente extends JPanel {
 }
 
 // Clase encargada de encapsular los atributos a enviar como mensaje (Nick, IP, Mensaje)
-class PaqueteEnvio {
+// Esta clase se debe serializar para convertirla en Bytes y asi poder ser enviada
+class PaqueteEnvio implements Serializable {
 
     private String nick, ip, mensaje;
 

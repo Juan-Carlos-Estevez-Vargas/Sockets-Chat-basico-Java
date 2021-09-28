@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","u":"allclasses-index.html"},{"p":"sockets_chat","l":"Cliente"},{"p":"sockets_chat","l":"Servidor"}];updateSearchResults();

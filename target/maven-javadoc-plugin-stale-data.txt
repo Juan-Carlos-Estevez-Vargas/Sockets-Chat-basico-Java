@@ -1,0 +1,45 @@
+@options
+@packages
+@argfile
+-encoding
+'UTF-8'
+-protected
+-source
+'16'
+-sourcepath
+'D:/Documents/Cursos/Java/Sockets_Chat/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2021. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'D:/Documents/Cursos/Java/Sockets_Chat/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'Sockets_Chat 1.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'Sockets_Chat 1.0-SNAPSHOT API'
+sockets_chat
+'D:/Documents/Cursos/Java/Sockets_Chat/src/main/java/sockets_chat/Cliente.java'
+'D:/Documents/Cursos/Java/Sockets_Chat/src/main/java/sockets_chat/Servidor.java'
+D:\Documents\Cursos\Java\Sockets_Chat\src\main\java = 1632753627242
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\allclasses-index.html = 1632787272679
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\allpackages-index.html = 1632787272682
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\element-list = 1632787272635
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\help-doc.html = 1632787272704
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\index-all.html = 1632787272698
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\index.html = 1632787272700
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\jquery-ui.overrides.css = 1632787272744
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\member-search-index.js = 1632787272687
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\module-search-index.js = 1632787272683
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\overview-tree.html = 1632787272667
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\package-search-index.js = 1632787272685
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\script.js = 1632787272710
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\search.js = 1632787272714
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\stylesheet.css = 1632787272708
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\tag-search-index.js = 1632787272689
+D:\Documents\Cursos\Java\Sockets_Chat\target\site\apidocs\type-search-index.js = 1632787272686

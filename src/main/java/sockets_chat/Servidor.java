@@ -8,6 +8,7 @@ package sockets_chat;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -72,7 +73,7 @@ class MarcoServidor extends JFrame implements Runnable {
 
                     // Leyendo el flujo de datos de entrada al paquete recibido
                     paquete_recibido = (PaqueteEnvio) flujo_entrada_datos.readObject();
-                    
+
                     // Obteniendo los datos recibidos del paquete
                     nick = paquete_recibido.getNick();
                     ip = paquete_recibido.getIp();
@@ -81,6 +82,15 @@ class MarcoServidor extends JFrame implements Runnable {
                     // Añadiendo el mensaje recibido al area de texto
                     area_texto.append("\n" + nick + ": " + mensaje + " para: " + ip);
 
+                    // Socket para reenviar la información recibida a su correspondiente cliente
+                    try ( Socket enviar_destinatario = new Socket(ip, 9090)) {
+                        ObjectOutputStream paquete_reenvio = new ObjectOutputStream(enviar_destinatario.getOutputStream());
+                        paquete_reenvio.writeObject(paquete_recibido);
+                        paquete_reenvio.close();
+                        enviar_destinatario.close();
+                    }
+
+                    // Cerrando Sockets
                     socket.close();
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(MarcoServidor.class.getName()).log(Level.SEVERE, null, ex);

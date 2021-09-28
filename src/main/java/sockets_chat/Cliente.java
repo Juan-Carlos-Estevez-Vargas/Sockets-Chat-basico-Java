@@ -8,7 +8,10 @@ package sockets_chat;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,7 +46,7 @@ class MarcoCliente extends JFrame {
 }
 
 // Construyendo el JPanel 
-class PanelMarcoCliente extends JPanel {
+class PanelMarcoCliente extends JPanel implements Runnable{
 
     // Variables
     private final JTextField campo1, nick, ip;
@@ -72,40 +75,67 @@ class PanelMarcoCliente extends JPanel {
         this.add(area_texto);
         this.add(campo1);
         this.add(boton);
+        
+        // CRreando hilo que esta siempre pendiente de los mensajes que le llegan
+        Thread hilo_recibiendo_mensajes = new Thread(this);
+        hilo_recibiendo_mensajes.start();
+    }
+
+    // Método para correr el hilo en segundo plano
+    @Override
+    public void run() {
+        try {
+            ServerSocket servidor_cliente = new ServerSocket(9090);
+            Socket cliente;
+            PaqueteEnvio paquete_recibido;
+            
+            while   (true){
+                cliente=servidor_cliente.accept();
+                ObjectInputStream flujo_entrada = new ObjectInputStream(cliente.getInputStream());
+                paquete_recibido=(PaqueteEnvio) flujo_entrada.readObject();
+                area_texto.append("\n"+paquete_recibido.getNick()+": "+paquete_recibido.getMensaje()+" de: "+paquete_recibido.getIp());
+            }
+
+        } catch (ClassNotFoundException |IOException e) {
+            Logger.getLogger(PanelMarcoCliente.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
     // Clase interna que envía mensajes de texto
     private class EnviarTexto implements ActionListener {
-
+        
         @Override
         public void actionPerformed(ActionEvent e) {
+            
+            // Escribiendo el mensaje que envía el cliente
+            area_texto.append("\n"+ campo1.getText());
+            
             try {
+                
                 // Creación del Socket
-                Socket socket = new Socket("192.168.56.1", 9999);
-
-                // Instancia de la clase PaqueteEnvio
-                PaqueteEnvio datos = new PaqueteEnvio();
-
-                // Seteando atributos de la clase Paquete Envio
-                datos.setNick(nick.getText());
-                datos.setIp(ip.getText());
-                datos.setMensaje(campo1.getText());
-
-                // Flujo de datos de tipo Objeto
-                ObjectOutputStream paquete_datos = new ObjectOutputStream(socket.getOutputStream());
-                paquete_datos.writeObject(datos); // Escribiendo en el flujo de datos
-
-                socket.close();
+                try (Socket socket = new Socket("192.168.56.1", 9999)) {
+                    
+                    // Instancia de la clase PaqueteEnvio
+                    PaqueteEnvio datos = new PaqueteEnvio();
+                    
+                    // Seteando atributos de la clase Paquete Envio
+                    datos.setNick(nick.getText());
+                    datos.setIp(ip.getText());
+                    datos.setMensaje(campo1.getText());
+                    
+                    // Flujo de datos de tipo Objeto
+                    ObjectOutputStream paquete_datos = new ObjectOutputStream(socket.getOutputStream());
+                    paquete_datos.writeObject(datos); // Escribiendo en el flujo de datos
+                }
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
             }
         }
-
     }
 }
 
-// Clase encargada de encapsular los atributos a enviar como mensaje (Nick, IP, Mensaje)
-// Esta clase se debe serializar para convertirla en Bytes y asi poder ser enviada
+/* Clase encargada de encapsular los atributos a enviar como mensaje (Nick, IP, Mensaje)
+   Esta clase se debe serializar para convertirla en Bytes y asi poder ser enviada */
 class PaqueteEnvio implements Serializable {
 
     private String nick, ip, mensaje;

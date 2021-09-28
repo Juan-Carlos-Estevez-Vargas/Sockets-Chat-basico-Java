@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -68,6 +69,10 @@ class MarcoServidor extends JFrame implements Runnable {
                 // Creando un Socket que acepte las conexiones con el Socket servidor
                 try ( Socket socket = socket_servidor.accept()) {
 
+                    // ---------------  DETECTANDO USUARIOS ONLINE  ------------------------
+                    InetAddress localizacion = socket.getInetAddress();
+                    String ip_remota = localizacion.getHostAddress();
+                    
                     // Creando el flujo de datos de entrada
                     ObjectInputStream flujo_entrada_datos = new ObjectInputStream(socket.getInputStream());
 

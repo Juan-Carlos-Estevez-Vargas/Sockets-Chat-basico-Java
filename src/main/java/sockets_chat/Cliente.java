@@ -7,14 +7,18 @@ package sockets_chat;
 // Librerías y paquetes necesarios
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -42,22 +46,55 @@ class MarcoCliente extends JFrame {
         this.add(panel);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
+        
+        // Al abrir la ventana se ejecutará el evento de ventana construido en la clase inferior
+        this.addWindowListener(new EnvioConexionOnline());
+    }
+}
+
+// Clase encargada de enviar señal online cuando nos conectemos a la App (Evento de ventana)
+class EnvioConexionOnline extends WindowAdapter {
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        try {
+            try ( Socket socket_conexion_online = new Socket("192.168.56.1", 9999)) {
+                PaqueteEnvio datos_conexion_online = new PaqueteEnvio();
+                datos_conexion_online.setMensaje("online");
+                ObjectOutputStream flujo_datos_conexion_online = new ObjectOutputStream(socket_conexion_online.getOutputStream());
+                flujo_datos_conexion_online.writeObject(datos_conexion_online);
+            }
+        } catch (IOException ex) {
+        }
     }
 }
 
 // Construyendo el JPanel 
-class PanelMarcoCliente extends JPanel implements Runnable{
+class PanelMarcoCliente extends JPanel implements Runnable {
 
     // Variables
-    private final JTextField campo1, nick, ip;
+    private final JTextField campo1;
+    private final JComboBox ip;
+    private final JLabel nick;
     private final JButton boton;
     private final JTextArea area_texto;
 
     // Constructor de clase
     public PanelMarcoCliente() {
-        nick = new JTextField(5);
-        ip = new JTextField(8);
-        JLabel texto = new JLabel("--- CHAT ---");
+
+        // Construyendo el Nickname
+        String nick_usuario = JOptionPane.showInputDialog("Nick: ");
+        JLabel n_nick = new JLabel("Nick: ");
+        nick = new JLabel();
+        nick.setText(nick_usuario);
+
+        // Construyendo el ComboBox
+        ip = new JComboBox();
+        ip.addItem("Usuario 1");
+        ip.addItem("Usuario 2");
+        ip.addItem("Usuario 3");
+
+        JLabel texto = new JLabel("Online: ");
         area_texto = new JTextArea(12, 20);
         campo1 = new JTextField(20);
         boton = new JButton("ENVIAR");
@@ -69,13 +106,14 @@ class PanelMarcoCliente extends JPanel implements Runnable{
         boton.addActionListener(evento);
 
         // Añadiendo los componenetes Swing al Panel
+        this.add(n_nick);
         this.add(nick);
         this.add(texto);
         this.add(ip);
         this.add(area_texto);
         this.add(campo1);
         this.add(boton);
-        
+
         // CRreando hilo que esta siempre pendiente de los mensajes que le llegan
         Thread hilo_recibiendo_mensajes = new Thread(this);
         hilo_recibiendo_mensajes.start();
@@ -88,41 +126,41 @@ class PanelMarcoCliente extends JPanel implements Runnable{
             ServerSocket servidor_cliente = new ServerSocket(9090);
             Socket cliente;
             PaqueteEnvio paquete_recibido;
-            
-            while   (true){
-                cliente=servidor_cliente.accept();
+
+            while (true) {
+                cliente = servidor_cliente.accept();
                 ObjectInputStream flujo_entrada = new ObjectInputStream(cliente.getInputStream());
-                paquete_recibido=(PaqueteEnvio) flujo_entrada.readObject();
-                area_texto.append("\n"+paquete_recibido.getNick()+": "+paquete_recibido.getMensaje()+" de: "+paquete_recibido.getIp());
+                paquete_recibido = (PaqueteEnvio) flujo_entrada.readObject();
+                area_texto.append("\n" + paquete_recibido.getNick() + ": " + paquete_recibido.getMensaje() + " de: " + paquete_recibido.getIp());
             }
 
-        } catch (ClassNotFoundException |IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             Logger.getLogger(PanelMarcoCliente.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
     // Clase interna que envía mensajes de texto
     private class EnviarTexto implements ActionListener {
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            
+
             // Escribiendo el mensaje que envía el cliente
-            area_texto.append("\n"+ campo1.getText());
-            
+            area_texto.append("\nYo: " + campo1.getText());
+
             try {
-                
+
                 // Creación del Socket
-                try (Socket socket = new Socket("192.168.56.1", 9999)) {
-                    
+                try ( Socket socket = new Socket("192.168.56.1", 9999)) {
+
                     // Instancia de la clase PaqueteEnvio
                     PaqueteEnvio datos = new PaqueteEnvio();
-                    
+
                     // Seteando atributos de la clase Paquete Envio
                     datos.setNick(nick.getText());
-                    datos.setIp(ip.getText());
+                    datos.setIp((String) ip.getSelectedItem());
                     datos.setMensaje(campo1.getText());
-                    
+
                     // Flujo de datos de tipo Objeto
                     ObjectOutputStream paquete_datos = new ObjectOutputStream(socket.getOutputStream());
                     paquete_datos.writeObject(datos); // Escribiendo en el flujo de datos

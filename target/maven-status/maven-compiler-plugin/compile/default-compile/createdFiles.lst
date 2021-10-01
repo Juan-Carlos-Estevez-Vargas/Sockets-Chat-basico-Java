@@ -1,5 +1,6 @@
 sockets_chat\PanelMarcoCliente$EnviarTexto.class
 sockets_chat\MarcoCliente.class
+sockets_chat\EnvioConexionOnline.class
 sockets_chat\Cliente.class
 sockets_chat\MarcoServidor.class
 sockets_chat\Servidor.class

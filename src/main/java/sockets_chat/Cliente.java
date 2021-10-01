@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -46,9 +47,8 @@ class MarcoCliente extends JFrame {
         this.add(panel);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        
-        // Al abrir la ventana se ejecutará el evento de ventana construido en la clase inferior
-        this.addWindowListener(new EnvioConexionOnline());
+
+        // Al abrir la ventana se ejecutará el evento de ventana construido en la clase inferior        this.addWindowListener(new EnvioConexionOnline());
     }
 }
 
@@ -90,9 +90,6 @@ class PanelMarcoCliente extends JPanel implements Runnable {
 
         // Construyendo el ComboBox
         ip = new JComboBox();
-        ip.addItem("Usuario 1");
-        ip.addItem("Usuario 2");
-        ip.addItem("Usuario 3");
 
         JLabel texto = new JLabel("Online: ");
         area_texto = new JTextArea(12, 20);
@@ -131,7 +128,19 @@ class PanelMarcoCliente extends JPanel implements Runnable {
                 cliente = servidor_cliente.accept();
                 ObjectInputStream flujo_entrada = new ObjectInputStream(cliente.getInputStream());
                 paquete_recibido = (PaqueteEnvio) flujo_entrada.readObject();
-                area_texto.append("\n" + paquete_recibido.getNick() + ": " + paquete_recibido.getMensaje() + " de: " + paquete_recibido.getIp());
+
+                // Si ya estan chateando o no se ha recibido el mensaje "online"
+                if (!paquete_recibido.getMensaje().equals("online")) {
+                    area_texto.append("\n" + paquete_recibido.getNick() + ": " + paquete_recibido.getMensaje());
+                } else { // Si se acaba de conectar el usuario
+                    ArrayList<String> ips_menu = new ArrayList<>();
+                    ips_menu = paquete_recibido.getDirecciones_ip();
+                    ip.removeAllItems();
+
+                    for (String z : ips_menu) {
+                        ip.addItem(z);
+                    }
+                }
             }
 
         } catch (ClassNotFoundException | IOException e) {
@@ -177,10 +186,19 @@ class PanelMarcoCliente extends JPanel implements Runnable {
 class PaqueteEnvio implements Serializable {
 
     private String nick, ip, mensaje;
+    private ArrayList<String> direcciones_ip;
 
     // Getters and Setters
     public String getNick() {
         return nick;
+    }
+
+    public ArrayList<String> getDirecciones_ip() {
+        return direcciones_ip;
+    }
+
+    public void setDirecciones_ip(ArrayList<String> direcciones_ip) {
+        this.direcciones_ip = direcciones_ip;
     }
 
     public void setNick(String nick) {
